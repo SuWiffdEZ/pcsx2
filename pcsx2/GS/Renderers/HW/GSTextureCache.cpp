@@ -901,13 +901,12 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 // Called each time you want to read from the GS memory
 void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r)
 {
-	u32 bp = off.bp();
-	u32 psm = off.psm();
-	u32 bw = off.bw();
+	const u32 bp = off.bp();
+	const u32 psm = off.psm();
 
 	GL_CACHE("TC: InvalidateLocalMem off(0x%x, %u, %s) r(%d, %d => %d, %d)",
 		bp,
-		bw,
+		off.bw(),
 		psm_str(psm),
 		r.x,
 		r.y,
@@ -2019,7 +2018,6 @@ void GSTextureCache::Source::PreloadSmallLevel(int level)
 	const GSVector4i rect(0, 0, tw, th);
 	const GSVector4i block_rect(rect.ralign<Align_Outside>(bs));
 	const GSOffset& off = m_renderer->m_context->offset.tex;
-	GSLocalMemory& mem = m_renderer->m_mem;
 
 	// Expand texture/apply palette.
 	u32 pitch = static_cast<u32>(block_rect.z) * sizeof(u32);
@@ -2419,7 +2417,7 @@ GSTextureCache::SurfaceOffset GSTextureCache::ComputeSurfaceOffset(const Surface
 
 	const GSVector4i& r1 = so.b2a_offset;
 	const GSVector4i& r2 = b_rect;
-	const GSVector4i ri = r1.rintersect(r2);
+	[[maybe_unused]] const GSVector4i ri = r1.rintersect(r2);
 	assert(!so.is_valid || (r1.eq(ri) && r1.x >= 0 && r1.y >= 0 && r1.z > 0 && r1.w > 0));
 	
 	// Clear cache if size too big.
